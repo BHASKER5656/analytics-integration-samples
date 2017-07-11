@@ -1,0 +1,12 @@
+{ 
+  "_id": "_design/csv", 
+  "views": { 
+    "cloudant.csv": { 
+      "map": "function (doc) {\nemit(doc.c, null);\n}" 
+    } 
+  }, 
+  "lists": { 
+    "cloudant.csv": "function(head, req){var n=1000;var row;start({headers: {'Content-Type': 'text/csv'}});function loadFirst(n){var colSet={};var data=[];while((row=getRow())&&n>0&&(isDataRow(row))){var doc=row.doc;n--;var flatObj=flattenObject(doc);for (var key in Object.keys(flatObj)){if(!(Object.prototype.hasOwnProperty.call(colSet,key))){colSet[Object.keys(flatObj)[key]]='';}}data.push(flatObj);}return {colSet: colSet, data: data}};function isDataRow(row){if(!hasProp(row.doc,'timestamp')||!hasProp(row.doc,'deviceType')||!hasProp(row.doc,'eventType')||!hasProp(row.doc,'format')||row.doc['format']!='json'){return false;}return true;};function writeFirst(colSet,data){var columns=Object.keys(colSet);var headers=String(columns.join(','));headers=headers.split('#DOT#').join('_');headers+=',date,time\\n';send(headers);var x=0;data.forEach(function(flatObj){addRow(flatObj,colSet)});};function writeRest(colSet){while((row=getRow())&&isDataRow(row)){var doc=row.doc;var flatObj=flattenObject(doc);addRow(flatObj,colSet);}};function flattenRec(ob){var res={};for(var i in ob){if(!ob.hasOwnProperty(i)) continue;if(ob[i]=='[object Object]'){var flatObj=flattenRec(ob[i]);for(var x in flatObj){if(!flatObj.hasOwnProperty(x)) continue;res[i+'#DOT#'+x]=flatObj[x];}}else{res[i] = ob[i];}}return res;};function flattenObject(row){row[row['deviceType']+'_'+row['eventType']]=row['data'];delete row['data'];return flattenRec(row);};function hasProp(obj, field){return Object.prototype.hasOwnProperty.call(obj,field);};function addRow(flatObj,colSet){var line='';var col=Object.keys(colSet);for(var i=0;i<col.length;i++){if(line.length>0){line+=',';}if(hasProp(flatObj,col[i])){var val=flatObj[col[i]];if(typeof val=='string' && val.indexOf(',')>-1){line+='\"'+val.replace(/\"/g,'\"\"')+'\"';}else{line+=val;}}}try{var ts=flatObj['timestamp'];var arr=ts.split('T');line+=','+arr[0]+','+arr[1].substr(0,arr[1].length);}catch(err){line+=',,';}line+='\\n';send(line);};var loaded=loadFirst(n);writeFirst(loaded.colSet,loaded.data);writeRest(loaded.colSet);};" 
+  }, 
+  "language": "javascript" 
+} 

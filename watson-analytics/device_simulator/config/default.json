@@ -1,0 +1,16 @@
+{
+  "wiotp": {
+    "org" : "", // Put your WIoTP org here
+    "apiKey" : "", // Put your WIoTP API key here
+    "apiToken" : "", // Put your WIoTP API authentication token here
+    "httpDomain": "internetofthings.ibmcloud.com",
+    "mqttDomain": "messaging.internetofthings.ibmcloud.com"
+  },
+  "params" : {
+    "csvFilePath": "data/cloudant.csv",
+    "delete": false,
+    "rebuild": false,
+    "simulate": false,
+    "publishIntervalDivisor": 100
+  }
+}
