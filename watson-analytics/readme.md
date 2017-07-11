@@ -1,5 +1,5 @@
 # watson-analytics
 
 ## Documentation Links ##
-* [Main Page](/README.md)  
+* [Main Page](/readme.md)  
 * [Watson Analytics Device Simulator](/watson-analytics/device_simulator/README.md)  
