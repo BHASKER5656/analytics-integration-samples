@@ -2,7 +2,7 @@
 
 Make sure you have NodeJS runtime installed. If not, [install it](https://nodejs.org).
  
-If you are familiar with Git, clone this repository. Alternatively, you can download it as a zip file. To download a zip file with the contents of this repository, [go back to the main repository page](../../), click on "Clone or Download" and then click on Download ZIP. Once the download finishes, extract the contents of the zip file.
+If you are familiar with Git, clone this repository. Alternatively, you can download it as a zip file. To download a zip file with the contents of this repository, [go back to the main repository page](/readme.md), click on "Clone or Download" and then click on Download ZIP. Once the download finishes, extract the contents of the zip file.
 
 In order to run this simulator, you will need access to an instance of the Waton IoT Platform service. If you still don't have one, follow the instructions on [step 2 of this recipe](https://developer.ibm.com/recipes/tutorials/how-to-register-devices-in-ibm-iot-foundation/#r_step2) to create a Bluemix account and provision an instance of WIoTP.
 
