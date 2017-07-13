@@ -152,7 +152,7 @@ const convertFromRawDeviceData = (rawDeviceData) => {
   const deviceData = { timestamp, deviceType, deviceId, eventType, format, d: {} };
   Object.keys(rawDeviceData).forEach(key => {
     if (key.startsWith(rawDevicePayloadPrefix) && rawDeviceData[key] !== '') {
-      deviceData.d[key.split(rawDevicePayloadPrefix)[1]] = rawDeviceData[key];
+      deviceData.d[key.split(rawDevicePayloadPrefix)[1]] = parseFloat(rawDeviceData[key]);
     }
   })
   return deviceData;
