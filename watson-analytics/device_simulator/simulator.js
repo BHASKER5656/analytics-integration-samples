@@ -375,6 +375,7 @@ const connectDevices = (devices) => {
 }
 
 // Publish a device payload to WIoTP using a JSON with device events (containing metadata and payload)
+let numberOfPayloadsPublished = 0 
 const sendSimulatedPayload = (deviceData) => {
   return new Promise(resolve => {
     const { deviceId, deviceType, eventType, format, d } = deviceData;
@@ -385,6 +386,7 @@ const sendSimulatedPayload = (deviceData) => {
     if (client) {
       client.publish(topic, payload, {}, () => {
         console.log(`${clientId} published payload ${payload} to topic ${topic}.`);
+        numberOfPayloadsPublished++;
         resolve();
       });
     }
@@ -439,17 +441,25 @@ const printResponse =  (error, response, body) => {
   console.log(body);
 }
 
+
+
+// Helper function that extracts all the information needed by the simulator from the CSV file.
+// It also forwards the arrays needed for further steps in the simulation.
+const extractDataFromSimulatedDataFile = (csvFilePath) => readSimulatedDataFile(csvFilePath)
+  .then(simulatedData => getDevicesFromSimulatedData(simulatedData)
+    .then(devices => getDeviceTypesFromDevices(devices)
+      .then(deviceTypes => Promise.resolve({ deviceTypes, devices, simulatedData }))
+    )
+  )
+
+
 // Helper function that extracts all the information needed to delete/create devices and device types in WIoTP
 // from the CSV file and deletes all these devices and device types from WIoTP.
 // It also forwards the arrays needed for further steps in the simulation.
-const deleteWIoTPDevicesDataFromSimulatedDataFile = (csvFilePath) => readSimulatedDataFile(csvFilePath)
-  .then(simulatedData => getDevicesFromSimulatedData(simulatedData)
-    .then(devices => getDeviceTypesFromDevices(devices)
-      .then(deviceTypes => deleteDevicesFromWIoTP(devices)
-        .then(() => deleteDeviceTypesFromWIoTP(deviceTypes)
-          .then(() => Promise.resolve({ deviceTypes, devices, simulatedData }))
-        )
-      )
+const deleteWIoTPDevicesDataFromSimulatedDataFile = (csvFilePath) => extractDataFromSimulatedDataFile(csvFilePath)
+  .then(({ deviceTypes, devices, simulatedData }) => deleteDevicesFromWIoTP(devices)
+    .then(() => deleteDeviceTypesFromWIoTP(deviceTypes)
+      .then(() => Promise.resolve({ deviceTypes, devices, simulatedData }))
     )
   )
 
@@ -473,13 +483,13 @@ else if (REBUILD_DATA){
     .catch(console.error)
 }
 else if (SIMULATE_DATA){
-  readSimulatedDataFile(CSV_FILE_PATH)
-    .then(simulatedData => getDevicesFromSimulatedData(simulatedData)
+  extractDataFromSimulatedDataFile(CSV_FILE_PATH)
+    .then(({ devices, simulatedData }) => getDevicesFromSimulatedData(simulatedData)
       .then(() => console.log('Simulation data successfully read from CSV file. Connecting devices ...'))
-      .then(connectDevices)
+      .then(() => connectDevices(devices))
       .then(() => console.log('Devices connected. Starting simulation ...'))
       .then(() => simulate(simulatedData))
-      .then(() => console.log('Simulation ended. Disconnecting devices ...'))
+      .then(() => console.log('Simulation ended (' + numberOfPayloadsPublished + ' events published). Disconnecting devices ...'))
       .then(disconnectDevices)
     )
     .then(() => console.log(`Done in ${getExecutionTime()}`))
@@ -491,7 +501,7 @@ else if (REBUILD_AND_SIMULATE_DATA) {
       .then(() => connectDevices(devices))
       .then(() => console.log('Devices connected. Starting simulation ...'))
       .then(() => simulate(simulatedData))
-      .then(() => console.log('Simulation ended. Disconnecting devices ...'))
+      .then(() => console.log('Simulation ended (' + numberOfPayloadsPublished + ' events published). Disconnecting devices ...'))
       .then(disconnectDevices)
     )
     .then(() => console.log(`Done in ${getExecutionTime()}`))
