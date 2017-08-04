@@ -198,7 +198,7 @@ const getDevicesFromSimulatedData = (simulatedDevicesData) => Promise.resolve(si
 
 // Extract an array of unique device types from the array of devices
 const getDeviceTypesFromDevices = (devices) => Promise.resolve(devices
-  .filter((el1, i, arr) => arr.findIndex(el2 => el2.deviceType === el1.deviceType) === i)
+  .filter((el1, i, arr) => arr.findIndex(el2 => el2.type === el1.type) === i)
   .map(el => el.type))
 
 // Delete device types from WIoTP using an array of unique device types
