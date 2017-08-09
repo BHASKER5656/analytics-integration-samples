@@ -2,7 +2,7 @@
   "_id": "_design/csv", 
   "views": { 
     "cloudant.csv": { 
-      "map": "function (doc) {\nemit(doc.c, null);\n}" 
+      "map": "function (doc) {\nemit(doc.timestamp, doc);\n}" 
     } 
   }, 
   "lists": { 
